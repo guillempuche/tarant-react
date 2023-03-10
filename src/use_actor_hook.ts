@@ -1,8 +1,10 @@
 import { Actor } from 'tarant'
 import { useSyncExternalStore } from 'use-sync-external-store'
 
-export const useActorState = (actor: Actor) => {
-  function subscribe(callback) {
+export type UseActorSubscribeCallback = () => void;
+
+export const useActorState = (actor: Actor | any) => {
+  function subscribe(callback: UseActorSubscribeCallback) {
     const subId = +new Date()
     actor.ref.__reactSubs.set(subId, callback)
 
