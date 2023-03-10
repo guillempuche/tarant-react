@@ -1,0 +1,68 @@
+{
+  "name": "tarant-react",
+  "version": "1.0.0",
+  "description": "React Hook for the actor model library Tarant",
+  "main": "dist/index",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier \"*.{js,json,md}\" \"src/**/*.{js,ts}\" --write && eslint --fix '*.{js,json}' 'src/**/*.{ts,ts}'",
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "peerDependencies": {
+    "react": ">=14.18"
+  },
+  "prettier": {
+    "useTabs": false,
+    "semi": false,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "bracketSameLine": true,
+    "tabWidth": 2,
+    "printWidth": 80
+  },
+  "dependencies": {
+    "tarant": "^3.1.36",
+    "use-sync-external-store": "^1.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/plugin-transform-typescript": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@types/use-sync-external-store": "^0.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.8.4"
+  },
+  "contributors": [
+    "Kevin Mas Ruiz <masruizkevin@gmail.com>",
+    "Guillem Puche (https://github.com/guillempuche)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guillempuche/tarant-react.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/guillempuche/tarant-react#readme",
+  "bugs": {
+    "url": "https://github.com/guillempuche/tarant-react/issues"
+  },
+  "keywords": [
+    "react",
+    "actor model",
+    "actor system",
+    "actor",
+    "tarant",
+    "DDD",
+    "domain-driven design",
+    "state",
+    "management"
+  ]
+}
