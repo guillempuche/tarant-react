@@ -1,8 +1,10 @@
-// https://babeljs.io/docs/en/config-files#config-function-api
-module.exports = () => {
+module.exports = (api) => {
+  // Required by rollup.
+  api.cache(true);
+
   return {
-    ignore: ['./node_modules'],
-    presets: [['@babel/preset-env']],
+    // ignore: ['node_modules/**'],
+    presets: ['@babel/preset-env', '@babel/preset-react'],
     plugins: [
       // [
       //   '@babel/plugin-transform-react-jsx',
@@ -10,7 +12,7 @@ module.exports = () => {
       //     runtime: 'automatic',
       //   },
       // ],
-      ['@babel/plugin-transform-typescript'],
+      '@babel/plugin-transform-typescript',
     ],
-  }
-}
+  };
+};

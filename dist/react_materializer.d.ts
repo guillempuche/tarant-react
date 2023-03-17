@@ -1,4 +1,4 @@
-import { Actor, ActorMessage, IMaterializer } from "tarant";
+import { Actor, ActorMessage, IMaterializer } from 'tarant';
 export declare class ReactMaterializer implements IMaterializer {
     onInitialize(actor: Actor | any): void;
     onBeforeMessage(actor: Actor | any, message: ActorMessage): void;

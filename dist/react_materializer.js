@@ -20,8 +20,7 @@ export class ReactMaterializer {
         actor.__reactSnapshot = () => actor.__reactState;
         actor.__reactSubs = new Map();
     }
-    onBeforeMessage(actor, message) {
-    }
+    onBeforeMessage(actor, message) { }
     onAfterMessage(actor, message) {
         actor.self.ref.__reactState = shallowCopyOfActorState(actor);
         actor.self.ref.__reactSubs.forEach((cb) => cb());

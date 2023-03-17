@@ -1,4 +1,7 @@
-import { useSyncExternalStore } from 'use-sync-external-store';
+// This doesn't work in ESM, because use-sync-external-store only exposes CJS.
+// See: https://github.com/pmndrs/valtio/issues/452
+// The following is a workaround until ESM is supported.
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 export const useActorState = (actor) => {
     function subscribe(callback) {
         const subId = +new Date();

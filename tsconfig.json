@@ -2,19 +2,24 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "strict": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
     "esModuleInterop": true,
+    "strict": true,
+    "strictNullChecks": true,
     "declaration": true,
+    // "emitDeclarationOnly": true,
+    "sourceMap": false,
+    // "jsx": "react-jsx",
+    "jsx": "react",
     "moduleResolution": "node",
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitAny": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["src/*"]
-    },
-    "outDir": "./dist"
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
