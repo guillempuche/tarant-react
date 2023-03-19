@@ -6,6 +6,12 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 export type UseActorSubscribeCallback = () => void;
 
+/**
+ * React Hook to communicate with actors.
+ *
+ * @param actor
+ * @returns
+ */
 export const useActorState = (actor: Actor | any) => {
   function subscribe(callback: UseActorSubscribeCallback) {
     const subId = +new Date();
@@ -16,7 +22,7 @@ export const useActorState = (actor: Actor | any) => {
     };
   }
 
-  function getSnapshot() {
+  function getSnapshot(): Actor | any {
     return actor.ref.__reactState;
   }
 
