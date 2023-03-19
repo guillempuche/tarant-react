@@ -1,9 +1,0 @@
-{
-  "packages": [
-    "dist"
-  ],
-  "sandboxes": [
-    "react"
-  ],
-  "node": "16"
-}
