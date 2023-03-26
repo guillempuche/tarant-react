@@ -1,7 +1,8 @@
+import classNames from 'classnames';
 import React from 'react';
 
 export type ButtonProps = {
-  loading?: boolean;
+  isLoading?: boolean;
 };
 
 interface ButtonPropsDefault
@@ -14,17 +15,24 @@ interface ButtonPropsDefault
 
 export const Button: React.FC<ButtonPropsDefault> = ({
   children,
-  loading,
+  isLoading,
+  disabled,
+  className,
   ...props
 }) => {
   return (
     <button
       type="button"
+      disabled={disabled ?? isLoading}
       {...props}
-      className="text-white bg-green-600 hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-700 rounded-2xl px-5 py-2.5 text-sm text-center w-full h-fit"
+      className={classNames(
+        `flex items-center h-fit rounded-2xl px-5 py-2.5 focus:ring-4 focus:outline-none focus:ring-green-700 text-sm text-center text-white`,
+        disabled ? 'bg-gray-500' : 'bg-green-600 hover:bg-green-500',
+        className
+      )}
     >
       {children}
-      {loading ? (
+      {isLoading ? (
         <svg
           className="inline ml-2 w-4 h-4 text-white animate-spin"
           viewBox="0 0 100 101"

@@ -1,4 +1,2 @@
-export * from './author';
-export * from './library';
-export * from './quote';
+export * from './common/error';
 export * from './actor_configuration';
