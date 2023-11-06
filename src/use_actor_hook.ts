@@ -47,7 +47,7 @@ export const useActorState = (actor: Actor | any): Actor | any => {
       };
     },
     [actor]
-  ); // Ensure useCallback dependency array includes 'actor'
+  );
 
   /**
    * Retrieves the current state snapshot of the actor. It returns the current

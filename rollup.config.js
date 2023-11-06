@@ -37,67 +37,94 @@ const extensions = ['.js', '.ts', '.tsx', '.json'];
 
 module.exports = function (args) {
   return [
-    // Browser-friendly UMD.
+    // // Browser-friendly UMD.
+    // {
+    //   input: 'src/index.ts',
+    //   output: [
+    //     {
+    //       name: package.name,
+    //       file: package.browser,
+    //       format: 'umd',
+    //       exports: 'named',
+    //       globals: {
+    //         react: 'React',
+    //         // 'use-sync-external-store/shim': 'useSyncExternalStoreShim',
+    //       },
+    //     },
+    //   ],
+    //   plugins: [
+    //     peerDepsExternal(),
+    //     resolve({ extensions, browser: true }),
+    //     typescript(),
+    //     commonjs({ extensions }),
+    //   ],
+    // },
+    // // CommonJS (for Node) and ES module (for bundlers).
+    // {
+    //   input: 'src/index.ts',
+    //   output: [
+    //     // {
+    //     //   file: package.main,
+    //     //   format: 'esm',
+    //     //   // globals: {
+    //     //   //   react: 'React',
+    //     //   // },
+    //     // },
+    //     // {
+    //     //   file: `dist/index.cjs`,
+    //     //   format: 'cjs',
+    //     //   exports: 'named',
+    //     //   sourcemap: true,
+    //     // },
+    //     {
+    //       file: package.module,
+    //       format: 'es',
+    //       exports: 'named',
+    //       sourcemap: true,
+    //     },
+    //   ],
+    //   plugins: [
+    //     peerDepsExternal(),
+    //     resolve({ extensions }),
+    //     typescript(),
+    //     commonjs({ extensions }),
+    //     // babel({
+    //     //   include: 'src/**/*',
+    //     //   exclude: '**/node_modules/**',
+    //     //   babelHelpers: 'runtime',
+    //     //   extensions,
+    //     // }),
+    //     babel.getBabelOutputPlugin({
+    //       configFile: path.resolve(__dirname, 'babel.config.js'),
+    //       // exclude: 'node_modules/**',
+    //     }),
+    //   ],
+    // },
     {
       input: 'src/index.ts',
       output: [
         {
-          name: package.name,
-          file: package.browser,
-          format: 'umd',
-          exports: 'named',
-          globals: {
-            react: 'React',
-            // 'use-sync-external-store/shim': 'useSyncExternalStoreShim',
-          },
+          file: package.main,
+          format: 'cjs',
+          sourcemap: true,
         },
-      ],
-      plugins: [
-        peerDepsExternal(),
-        resolve({ extensions, browser: true }),
-        typescript(),
-        commonjs({ extensions }),
-      ],
-    },
-    // CommonJS (for Node) and ES module (for bundlers).
-    {
-      input: 'src/index.ts',
-      output: [
-        // {
-        //   file: package.main,
-        //   format: 'esm',
-        //   // globals: {
-        //   //   react: 'React',
-        //   // },
-        // },
-        // {
-        //   file: `dist/index.cjs`,
-        //   format: 'cjs',
-        //   exports: 'named',
-        //   sourcemap: true,
-        // },
         {
           file: package.module,
-          format: 'es',
-          exports: 'named',
+          format: 'esm',
           sourcemap: true,
         },
       ],
       plugins: [
         peerDepsExternal(),
-        resolve({ extensions }),
+        resolve(),
+        commonjs(),
         typescript(),
-        commonjs({ extensions }),
-        // babel({
-        //   include: 'src/**/*',
-        //   exclude: '**/node_modules/**',
-        //   babelHelpers: 'runtime',
-        //   extensions,
-        // }),
-        babel.getBabelOutputPlugin({
-          configFile: path.resolve(__dirname, 'babel.config.js'),
-          // exclude: 'node_modules/**',
+        babel({
+          babelHelpers: 'bundled',
+          extensions: ['.ts'],
         }),
+        // // Minifies the output
+        // terser(),
       ],
     },
   ];

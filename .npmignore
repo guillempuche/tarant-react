@@ -1,3 +1,16 @@
-node_modules
-examples
-tsconfig*
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Configuration files
+tsconfig.json
+rollup.config.js
+babel.config.js
+
+# Documentation source
+docs/
+*.md
+
+# Example app
+examples/
