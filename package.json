@@ -1,5 +1,5 @@
 {
-  "name": "tarant-react",
+  "name": "tarant-react-hook",
   "version": "0.1.0",
   "description": "React Hook for the actor model library Tarant",
   "main": "dist/cjs/index.ts",
