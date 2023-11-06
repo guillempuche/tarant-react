@@ -107,6 +107,7 @@ export class ActorLibrary extends Actor {
   }
 
   async updateCurrentEdit(currentEdit: CurrentEdit) {
+    console.log(currentEdit);
     this.props.currentEdit = currentEdit;
   }
 

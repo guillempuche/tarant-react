@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useActorState } from 'tarant-react';
+import { useActorState } from 'tarant-react-hook';
 
 import { actorLibrary, ActorLibrary } from './bounded_contexts/library/actors';
 import {

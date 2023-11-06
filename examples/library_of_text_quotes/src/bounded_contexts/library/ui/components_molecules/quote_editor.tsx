@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
-import { useActorState } from 'tarant-react';
+import { useActorState } from 'tarant-react-hook';
 import { None } from 'ts-results';
 
 import { Button } from '../../../../ui/components_atomic';

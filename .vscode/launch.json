@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/examples/library_of_text_quotes",
+      "sourceMaps": true
+    },
+    {
+      // IMPORTNAT: If you use `npm`, change the task configuration in `vscode/tasks.json`
+      // Reference: https://marketplace.visualstudio.com/items?itemName=firefox-devtools.vscode-firefox-debug
+      "name": "Launch Firefox",
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": false,
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/examples/library_of_text_quotes",
+      "preLaunchTask": "start-react-pnpm",
+      "postDebugTask": "terminate-react-server"
+    },
+    {
+      // To attach on Firefox, follow the instructions in section "Attach" in https://marketplace.visualstudio.com/items?itemName=firefox-devtools.vscode-firefox-debug
+      "name": "Attach Firefox",
+      "type": "firefox",
+      "request": "attach"
+    }
+  ]
+}

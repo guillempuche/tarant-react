@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
-import { useActorState } from 'tarant-react';
+import { useActorState } from 'tarant-react-hook';
 import { None, Option, Some } from 'ts-results';
 
 import { Button } from '../../../../ui/components_atomic';
@@ -59,8 +59,11 @@ export const CoLibraryItem: React.FC<LibraryItemPropsDefault> = ({
         <p className="dark:text-white flex-1">
           - {author.some ? author.val.props?.fullname : 'Anonymous'}
         </p>
-        {/* <Button onClick={onClickUpdate}>Update</Button> */}
-        <Button onClick={() => actorLibrary.updateCurrentEdit(Some(quote))}>
+        <Button
+          onClick={() => {
+            actorLibrary.updateCurrentEdit(Some(quote));
+          }}
+        >
           Update
         </Button>
         <Button onClick={deleteQuote}>Delete</Button>
