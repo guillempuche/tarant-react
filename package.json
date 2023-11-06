@@ -1,6 +1,6 @@
 {
   "name": "tarant-react-hook",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React Hook for the actor model library Tarant",
   "main": "dist/cjs/index.ts",
   "module": "dist/esm/index.js",
@@ -10,7 +10,6 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "build-old": "rollup -c && tsc",
     "start": "vite",
     "format": "prettier \"*.{js,json,md}\" \"{src,examples}/**/*.{js,ts}\" --write && eslint --fix '*.{js,json}' '{src,examples}/**/*.{ts,ts}'"
   },
