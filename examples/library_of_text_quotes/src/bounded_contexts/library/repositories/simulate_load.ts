@@ -1,3 +1,2 @@
-export const simulateLoad: (timeMs?: number) => Promise<void> = async (
-  timeMs
-) => await new Promise((_) => setTimeout(() => {}, timeMs ?? 1000));
+export const simulateLoad: (time?: number) => Promise<void> = async (time) =>
+  await new Promise((r) => setTimeout(r, time ?? 2000));
