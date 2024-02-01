@@ -1,4 +1,4 @@
-import { Actor, ActorMessage, IMaterializer } from "tarant";
+import { Actor, ActorMessage, IMaterializer } from 'tarant';
 /**
  * A materializer for React that integrates with the Tarant actor model.
  * This class implements the `IMaterializer` interface from Tarant and provides

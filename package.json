@@ -1,68 +1,55 @@
 {
   "name": "tarant-react-hook",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React Hook for the actor model library Tarant",
-  "main": "dist/cjs/index.ts",
-  "module": "dist/esm/index.js",
+  "module": "dist/esm/bundle.js",
   "types": "dist/esm/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "rollup -c",
-    "start": "vite",
-    "format": "prettier \"*.{js,json,md}\" \"{src,examples}/**/*.{js,ts}\" --write && eslint --fix '*.{js,json}' '{src,examples}/**/*.{ts,ts}'"
-  },
-  "engines": {
-    "node": ">=14.18"
+    "lint": "biome check --apply ."
   },
   "peerDependencies": {
-    "react": "^18.2.0"
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "tarant": ">=3.1.47"
   },
-  "prettier": {
-    "useTabs": false,
-    "semi": true,
-    "trailingComma": "es5",
-    "singleQuote": true,
-    "bracketSameLine": false,
-    "tabWidth": 2,
-    "printWidth": 80
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
-    "tarant": "^3.1.36",
+    "flatted": "^3.2.9",
+    "immer": "^10.0.3",
+    "immutable": "^4.3.5",
+    "lodash": "^4.17.21",
+    "react-tooltip": "^5.26.0",
+    "ts-results": "^3.3.0",
     "use-sync-external-store": "^1.2.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.0",
-    "@babel/eslint-parser": "^7.19.1",
-    "@babel/plugin-transform-react-jsx": "^7.21.0",
-    "@babel/plugin-transform-typescript": "^7.21.0",
-    "@babel/preset-env": "^7.20.2",
-    "@babel/preset-react": "^7.18.6",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^24.0.1",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-typescript": "^11.0.0",
-    "@types/react": "^18.0.37",
-    "@types/use-sync-external-store": "^0.0.3",
+    "@babel/core": "^7.23.7",
+    "@babel/plugin-transform-typescript": "^7.23.6",
+    "@babel/preset-env": "^7.23.6",
+    "@babel/preset-react": "^7.23.3",
+    "@biomejs/biome": "1.5.3",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/lodash": "^4",
+    "@types/node": "^20.11.7",
+    "@types/react": "^18.2.48",
+    "@types/use-sync-external-store": "^0.0.6",
     "@types/uuid": "^9.0.1",
-    "@typescript-eslint/eslint-plugin": "^5.54.1",
-    "@typescript-eslint/parser": "^5.54.1",
-    "@vitejs/plugin-react": "^3.1.0",
-    "eslint": "^8.35.0",
-    "eslint-config-prettier": "^8.7.0",
-    "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^2.8.4",
-    "rollup": "^3.19.1",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "vite": "^4.2.0"
+    "rollup": "^4.9.2",
+    "tarant": "portal:../tarant",
+    "typescript": "^5.3.1"
   },
   "contributors": [
-    "Guillem Puche (https://github.com/guillempuche)",
-    "Kevin Mas Ruiz (https://github.com/kmruiz)"
+    "Guillem Puche (https://github.com/guillempuche)"
   ],
   "repository": {
     "type": "git",
@@ -85,5 +72,6 @@
     "messaging",
     "state",
     "state management"
-  ]
+  ],
+  "packageManager": "yarn@4.0.2"
 }

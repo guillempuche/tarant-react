@@ -1,25 +1,20 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "declaration": true,
-    // "emitDeclarationOnly": true,
-    "sourceMap": false,
-    // "jsx": "react-jsx",
-    "jsx": "react",
-    "moduleResolution": "node",
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ES2022",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"esModuleInterop": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"declaration": true,
+		"sourceMap": true,
+		"moduleResolution": "node",
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
+		"forceConsistentCasingInFileNames": true
+		// "baseUrl": ".",
+	},
+	"include": ["src"],
+	"exclude": ["node_modules", "dist", "examples", "draft"]
 }

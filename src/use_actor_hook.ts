@@ -1,70 +1,77 @@
+import { useEffect, useReducer } from 'react';
 import { Actor } from 'tarant';
-import { useCallback } from 'react';
 import { v4 as uuid } from 'uuid';
 
-// This doesn't work in ESM, because use-sync-external-store only exposes CJS.
-// See: https://github.com/pmndrs/valtio/issues/452
-// The following is a workaround until ESM is supported.
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
+/**
+ * Custom React hook to force a component to re-render.
+ * @returns A function that can be called to force a re-render.
+ */
+const useForceUpdate = () => {
+	// useReducer is used to create a state update function.
+	const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
-export type UseActorSubscribeCallback = () => void;
+	return forceUpdate;
+};
 
 /**
- * React Hook to communicate with actors. This hook is designed to be used with
- * the Tarant library, providing an interface for subscribing to actor state changes
- * in a React application.
+ * Custom React hook to synchronize a React component's state with a Tarant actor.
+ * 
+ * @example
+ 
+ * // Define the actor
+ * interface MyActorConstructor extends ActorConstructor {
+ *   paramA: string;
+ * }
+ * class MyActor extends Actor {
+ *   #fieldA: string;
+ * 
+ *   constructor({ paramA }: MyActorConstructor) {
+ *     super();
+ *     this.#fieldA = paramA;
+ *   }
  *
- * @param actor - The actor instance you want to subscribe to.
- * @returns - The current state of the actor.
+ *   get fieldA(): string {
+ *     return this.#fieldA;
+ *   }
+ * }
+ *
+ * // Initialize the actor system with ReactMaterializer
+ * const actorSystem = ActorSystem.for(
+ *   ActorSystemConfigurationBuilder.define()
+ *     .withMaterializers([new ReactMaterializer()])
+ *     .done(),
+ * );
+ * const myActor = actorSystem.actorOf<MyActor, MyActorConstructor>(MyActor, { paramA: 'initial' });
+ *
+ * // Usage in a React component
+ * import React from 'react';
+ * import { useActorState } from 'tarant-react-hook';
+ * 
+ * const MyComponent: React.FC = () => {
+ *   const actor = useActorState(myActor);
+ *   return <div>{actor.fieldA}</div>;
+ * };
+ * 
+ * @param actor - The actor whose state is to be synchronized.
+ * @returns The same actor, allowing React components to reflect its updated state.
  */
-export const useActorState = (actor: Actor | any): Actor | any => {
-  /**
-   * Subscribes to the state changes of the actor by adding a callback to the
-   * actor's subscription set. When the state changes, all the callbacks in the
-   * set will be called.
-   *
-   * It returns a function to unsubscribe from the state changes.
-   *
-   * `useCallback` memoizes the subscribe function to prevent unnecessary re-renders.
-   */
-  const subscribe = useCallback(
-    (callback: UseActorSubscribeCallback) => {
-      if (!actor.ref || !actor.ref.__reactSubs) {
-        throw new Error(
-          'Invalid actor reference or subscriptions are not defined.'
-        );
-      }
+export const useActorState = <T extends Actor>(actor: T): T => {
+	const forceUpdate = useForceUpdate();
 
-      // Generate a unique subscription ID.
-      const subId = uuid();
+	// It manages the subscription and unsubscription to the actor's state changes.
+	useEffect(() => {
+		// const subscriptionId = uuid();
+		const subscriptionId = actor.id + uuid();
 
-      // Add the callback to the actor's subscription set
-      actor.ref.__reactSubs.set(subId, callback);
+		// Subscribe the forceUpdate function to the actor's state changes.
+		actor.stateChangeSubscriptions?.set(subscriptionId, forceUpdate);
 
-      // Return a function to remove the subscription
-      return () => {
-        actor.ref.__reactSubs.delete(subId);
-      };
-    },
-    [actor]
-  );
+		// Cleanup function for useEffect. It unsubscribes on component unmount.
+		return () => {
+			// Unsubscribe when the component unmounts
+			actor.stateChangeSubscriptions?.delete(subscriptionId);
+		};
+	}, [actor, forceUpdate]);
 
-  /**
-   * Retrieves the current state snapshot of the actor. It returns the current
-   * state of the actor.
-   *
-   * `useCallback` memoizes `getSnapshot` function to prevent unnecessary re-renders.
-   */
-  // function getSnapshot(): Actor | any {
-  const getSnapshot = useCallback((): Actor | any => {
-    if (!actor.ref || !actor.ref.__reactState) {
-      throw new Error('Invalid actor reference or state is not defined.');
-    }
-
-    return actor.ref.__reactState;
-  }, [actor]);
-
-  // Use the `useSyncExternalStore` hook from the shim to handle subscription
-  // and state retrieval for the given actor
-  return useSyncExternalStore<Actor | any>(subscribe, getSnapshot);
+	return actor;
 };

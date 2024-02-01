@@ -4,12 +4,16 @@ src/
 !*.d.ts
 
 # Configuration files
+.vscode
 tsconfig.json
 rollup.config.js
 babel.config.js
 
-# Documentation source
-docs/
+# Codesandbox
+.codesandbox
 
 # Example app
 examples/
+
+# Rest
+draft/

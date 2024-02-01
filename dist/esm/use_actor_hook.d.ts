@@ -1,11 +1,44 @@
 import { Actor } from 'tarant';
-export type UseActorSubscribeCallback = () => void;
 /**
- * React Hook to communicate with actors. This hook is designed to be used with
- * the Tarant library, providing an interface for subscribing to actor state changes
- * in a React application.
+ * Custom React hook to synchronize a React component's state with a Tarant actor.
  *
- * @param actor - The actor instance you want to subscribe to.
- * @returns - The current state of the actor.
+ * @example
+ 
+ * // Define the actor
+ * interface MyActorConstructor extends ActorConstructor {
+ *   paramA: string;
+ * }
+ * class MyActor extends Actor {
+ *   #fieldA: string;
+ *
+ *   constructor({ paramA }: MyActorConstructor) {
+ *     super();
+ *     this.#fieldA = paramA;
+ *   }
+ *
+ *   get fieldA(): string {
+ *     return this.#fieldA;
+ *   }
+ * }
+ *
+ * // Initialize the actor system with ReactMaterializer
+ * const actorSystem = ActorSystem.for(
+ *   ActorSystemConfigurationBuilder.define()
+ *     .withMaterializers([new ReactMaterializer()])
+ *     .done(),
+ * );
+ * const myActor = actorSystem.actorOf<MyActor, MyActorConstructor>(MyActor, { paramA: 'initial' });
+ *
+ * // Usage in a React component
+ * import React from 'react';
+ * import { useActorState } from 'tarant-react-hook';
+ *
+ * const MyComponent: React.FC = () => {
+ *   const actor = useActorState(myActor);
+ *   return <div>{actor.fieldA}</div>;
+ * };
+ *
+ * @param actor - The actor whose state is to be synchronized.
+ * @returns The same actor, allowing React components to reflect its updated state.
  */
-export declare const useActorState: (actor: Actor | any) => Actor | any;
+export declare const useActorState: <T extends Actor>(actor: T) => T;
