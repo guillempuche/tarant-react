@@ -1,42 +1,77 @@
-import { useEffect } from 'react';
-import { useActorState } from 'tarant-react-hook';
+import { useEffect } from "react";
+import { Tooltip } from "react-tooltip";
+import { useActor } from "tarant-react-hook";
+import { None } from "ts-results";
 
-import { actorLibrary, ActorLibrary } from './bounded_contexts/library/actors';
 import {
-  CoLibraryItem,
-  CoQuoteEditor,
-} from './bounded_contexts/library/ui/components_molecules';
+	actorEditorsManager,
+	actorLibrary,
+} from "@/bounded_contexts/library/actors";
+import { Editor, LibraryItem } from "@/bounded_contexts/library/ui";
+import { Button } from "@/common_ui";
 
 export function App() {
-  const library: ActorLibrary = useActorState(actorLibrary);
+	const libraryState = useActor(actorLibrary);
+	const editorsManagerState = useActor(actorEditorsManager);
 
-  useEffect(() => {
-    // Simulate the loading of quotes and authors.
-    actorLibrary.load();
-  }, []);
+	useEffect(() => {
+		actorLibrary.getRecommendations();
+	}, []);
 
-  return (
-    <div className="flex flex-col grow h-screen max-w-lg mx-auto px-6 pt-3 pb-2 space-y-4 bg-white dark:bg-black">
-      <div className="flex-1 flex-col overflow-auto rounded-xl space-y-4">
-        <h2 className="dark:text-white">
-          Your Library ({library.props.quotes.length})
-        </h2>
-        {library.props.quotes === undefined ||
-        library.props.quotes.length === 0 ? (
-          <div className="grow flex justify-center items-center rounded-3xl p-6">
-            <div className="text-center dark:text-white">
-              You don't have quotes
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col space-y-2">
-            {library.props.quotes.map((quote) => (
-              <CoLibraryItem key={quote.props.id} quote={quote} />
-            ))}
-          </div>
-        )}
-      </div>
-      <CoQuoteEditor />
-    </div>
-  );
+	const renderQuotes = () => {
+		if (libraryState.quotes.none || libraryState.authors.none)
+			return <div className="text-center dark:text-white">Loading...</div>;
+
+		if (libraryState.quotes.val.length === 0)
+			return (
+				<div className="grow flex justify-center items-center rounded-3xl p-6">
+					<div className="text-center dark:text-white">
+						You have no quotes or authors.
+					</div>
+				</div>
+			);
+
+		const quotes = libraryState.quotes.val?.map((quote) => quote);
+		const authors = libraryState.authors.val?.map((quote) => quote);
+		return (
+			<div className="flex flex-col space-y-2">
+				{quotes.map((quote) => {
+					const foundAuthor = quote.authorRef.some
+						? authors.find((author) => author.id === quote.authorRef.unwrap())
+						: undefined;
+					return (
+						<LibraryItem key={quote.id} quote={quote} author={foundAuthor} />
+					);
+				})}
+			</div>
+		);
+	};
+
+	const renderEditors = () => {
+		if (editorsManagerState.editors.some) {
+			return editorsManagerState.editors.val.map((editor) => (
+				<Editor key={editor.id} editor={editor} />
+			));
+		}
+	};
+
+	return (
+		<div className="flex flex-col grow h-screen max-w-lg mx-auto px-6 pt-3 space-y-4 bg-white dark:bg-black">
+			<div className="flex-1 overflow-x-hidden rounded-xl space-y-4">
+				{renderQuotes()}
+			</div>
+			<div className="flex flex-col items-end space-y-1 pb-3">
+				{renderEditors()}
+			</div>
+			{/* Floating button */}
+			<Button
+				tooltip="ACTION: ActorEditorsManager.addEditor"
+				onClick={() => actorEditorsManager.addEditor(None)}
+				className="fixed top-0 right-0 m-4"
+			>
+				Add Quote
+			</Button>
+			<Tooltip id="tooltip" />
+		</div>
+	);
 }

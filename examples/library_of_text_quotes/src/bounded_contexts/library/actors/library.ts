@@ -1,135 +1,227 @@
-import { Actor } from 'tarant';
-import { None, Ok, Option, Result } from 'ts-results';
-import { simulateLoad } from '../repositories/simulate_load';
+import {
+	Actor,
+	ActorConstructor,
+	IProtocol,
+	ProtocolMethods,
+	Topic,
+} from "tarant";
+import { Err, None, Ok, Option, Result, Some } from "ts-results";
 
-import { Error } from '../../../actors';
-import { mock_authors, mock_quotes } from './mock_data';
-import { ActorAuthor, ActorCollection, ActorQuote } from '.';
+import {
+	ErrBadRequest,
+	ErrNotFound,
+	Error,
+	actorSystem,
+} from "@/common_actors";
+import { mock_authors, mock_quotes } from "@/mock";
+import {
+	ActorAuthor,
+	ActorQuote,
+	IProtocolActorAuthor,
+	IProtocolActorQuote,
+	topicActorAuthor,
+	topicActorQuote,
+} from ".";
+import { simulateLoad } from "../repositories/simulate_load";
 
-export interface ILibrary {
-  quotes: ActorQuote[];
-  authors: ActorAuthor[];
-  currentEdit: CurrentEdit;
+export interface ActorLibraryConstructor extends ActorConstructor {
+	subscriberTopicNewContent: Topic<IProtocolNewContent>;
+	subscriberTopicActorQuote: Topic<IProtocolActorQuote>;
+	subscriberTopicActorAuthor: Topic<IProtocolActorAuthor>;
 }
 
-type CurrentEdit = Option<ActorQuote | ActorAuthor | ActorCollection>;
+// Used as a frontend state.
+export class ActorLibrary
+	extends Actor
+	implements
+		ProtocolMethods<IProtocolNewContent>,
+		ProtocolMethods<IProtocolActorQuote>,
+		ProtocolMethods<IProtocolActorAuthor>
+{
+	#quotes: Option<ActorQuote[]>;
+	#authors: Option<ActorAuthor[]>;
 
-export class ActorLibrary extends Actor {
-  readonly props: ILibrary;
+	constructor({
+		subscriberTopicNewContent,
+		subscriberTopicActorQuote,
+		subscriberTopicActorAuthor,
+	}: ActorLibraryConstructor) {
+		super("library");
+		this.subscribeToTopic(subscriberTopicNewContent);
+		this.subscribeToTopic(subscriberTopicActorQuote);
+		this.subscribeToTopic(subscriberTopicActorAuthor);
+		this.#quotes = None;
+		this.#authors = None;
+	}
 
-  private readonly topic: ProtocolLibrary;
+	get quotes(): Option<ActorQuote[]> {
+		return this.#quotes;
+	}
+	get authors(): Option<ActorAuthor[]> {
+		return this.#authors;
+	}
+	setQuotes(value: Option<ActorQuote[]>) {
+		this.#quotes = value;
+	}
+	setAuthors(value: Option<ActorAuthor[]>) {
+		this.#authors = value;
+	}
+	// Add the new quote to the local list
+	onNewQuote(actor: ActorQuote): void {
+		// If there are already other quotes
+		if (this.#quotes.some) {
+			this.self?.setQuotes(Some([...this.#quotes.val, actor]));
+			return;
+		}
 
-  constructor(topic: ProtocolLibrary) {
-    super();
+		this.self?.setQuotes(Some([actor]));
+	}
+	// Add the new author to the local list
+	onNewAuthor(actor: ActorAuthor): void {
+		// If there are already other authors
+		if (this.#authors.some) {
+			this.self?.setAuthors(Some([...this.#authors.val, actor]));
+			return;
+		}
 
-    const authors = mock_authors.map((el) =>
-      ActorAuthor.create({
-        id: el.id,
-        fullname: el.fullname,
-        birthDate: el.birthDate,
-      }).unwrap()
-    );
+		// If there are no authors yet
+		this.self?.setAuthors(Some([actor]));
+	}
+	// Function overloads
+	onUpdate(actorQuote: ActorQuote): void;
+	onUpdate(actorAuthor: ActorAuthor): void;
+	onUpdate(actor: ActorQuote | ActorAuthor): void {
+		if (actor instanceof ActorQuote) {
+			// Replace the corresponding quote
+			if (this.#quotes.some) {
+				const updatedQuotes = this.#quotes.val.map((quote) =>
+					quote.id === actor.id ? actor : quote,
+				);
+				this.self?.setQuotes(Some(updatedQuotes));
+			}
+			return;
+		}
+		if (actor instanceof ActorAuthor) {
+			// Replace the corresponding author
+			if (this.#authors.some) {
+				const updatedAuthors = this.#authors.val.map((author) =>
+					author.id === actor.id ? actor : author,
+				);
+				this.self?.setAuthors(Some(updatedAuthors));
+			}
+		}
+	}
+	/**
+	 * It loads all the actor quotes and authors to the Tarant system and make a copy
+	 * to ActorLibrary.
+	 */
+	async getRecommendations(): Promise<Result<void, Error>> {
+		try {
+			if (this.quotes.none || this.authors.none) {
+				const loadedQuotes: ActorQuote[] = [];
+				const loadedAuthors: ActorAuthor[] = [];
+				await simulateLoad();
 
-    const quotes = mock_quotes.map((mock) => {
-      return ActorQuote.create({
-        id: mock.id,
-        text: mock.text,
-        authorRef: mock.authorRef,
-        collectionRef: mock.collectionRef,
-        createdAt: mock.createdAt,
-        updatedAt: mock.updatedAt,
-      }).unwrap();
-    });
+				// Load the quotes and authors in Tarant (actor system)
+				for (const mock of mock_quotes) {
+					const newActor = actorSystem.actorOf(ActorQuote, {
+						topic: topicActorQuote,
+						id: mock.id,
+						text: mock.text,
+						authorRef: mock.authorRef,
+						collectionRef: mock.collectionRef,
+						createdAt: mock.createdAt,
+						isDraft: mock.isDraft,
+					});
+					loadedQuotes.push(newActor);
+				}
+				for (const mock of mock_authors) {
+					const newActor = actorSystem.actorOf(ActorAuthor, {
+						topic: topicActorAuthor,
+						id: mock.id,
+						fullname: mock.fullname,
+						birthDate: mock.birthDate,
+						isDraft: mock.isDraft,
+					});
+					loadedAuthors.push(newActor);
+				}
 
-    const currentEdit = None;
+				// Save copy in ActorLibrary
+				this.self?.setQuotes(Some(loadedQuotes));
+				this.self?.setAuthors(Some(loadedAuthors));
+			}
+			return Ok(undefined);
+		} catch (error) {
+			return Err(new ErrBadRequest("Failed to load recommendations"));
+		}
+	}
+	// /**
+	//  * Get a local actor by its ID.
+	//  */
+	// getById<T extends ActorQuote | ActorAuthor>(actorId: string): Option<T> {
+	// 	// Check in quotes
+	// 	if (this.#quotes.some) {
+	// 		const foundQuote = this.#quotes.val.find((quote) => quote.id === actorId);
+	// 		if (foundQuote) return Some(foundQuote as T);
+	// 	}
 
-    this.props = {
-      quotes,
-      authors,
-      currentEdit,
-    };
-    this.topic = topic;
-  }
+	// 	// Check in authors
+	// 	if (this.#authors.some) {
+	// 		const foundAuthor = this.#authors.val.find(
+	// 			(author) => author.id === actorId,
+	// 		);
+	// 		if (foundAuthor) return Some(foundAuthor as T);
+	// 	}
 
-  /**
-   * Simulate a load of all quotes and authors
-   */
-  async load() {
-    await simulateLoad();
+	// 	return None;
+	// }
+	async deleteActor(actorId: string): Promise<Result<void, Error>> {
+		try {
+			await simulateLoad();
 
-    // this.topic.onQuotesChanged();
-    // this.topic.onAuthorsChanged(Array.from(this.authors.values()));
-    // this.topic.onChange();
-  }
+			// First look for quotes.
+			if (this.#quotes.some) {
+				const index = this.#quotes.val.findIndex(
+					(quote) => quote.id === actorId,
+				);
+				if (index !== -1) {
+					const updatedQuotes = [...this.#quotes.val];
+					updatedQuotes.splice(index, 1);
+					this.self?.setQuotes(Some(updatedQuotes));
+					return Ok(undefined);
+				}
+			}
 
-  // getAllQuotes(): Result<IQuote[], ErrorLibraryRetrieveQuotes> {
-  //   const quotes = Array.from(this.quotes.values());
-  //   return Ok(quotes);
-  // }
+			// Then, look for authors.
+			if (this.#authors.some) {
+				const index = this.#authors.val.findIndex(
+					(author) => author.id === actorId,
+				);
+				if (index !== -1) {
+					const updatedAuthors = [...this.#authors.val];
+					updatedAuthors.splice(index, 1);
+					this.self?.setAuthors(Some(updatedAuthors));
+					return Ok(undefined);
+				}
+			}
 
-  // async retrieveAllQuotes(): Promise<
-  //   Result<IQuote[], ErrorLibraryRetrieveQuotes>
-  // > {
-  //   const quotes = Array.from(this.quotes.values());
-  //   await simulateLoad();
-  //   console.log('Loaded');
-  //   return Ok(quotes);
-  // }
-
-  // async getQuote(
-  //   text: string
-  // ): Promise<Result<Option<IQuote>, ErrorLibraryRetrieveQuote>> {
-  //   await simulateLoad();
-  //   const found = Array.from(this.quotes.values()).find(
-  //     (quote) => quote.text === text
-  //   );
-  //   return Ok(found !== undefined ? Some(found) : None);
-  // }
-
-  async addQuote(quote: ActorQuote): Promise<Result<None, Error<String>>> {
-    // addQuote(quote: ActorQuote): Result<None, Error<String>> {
-    console.log(`adding quote`);
-    await simulateLoad();
-
-    this.props.quotes.push(quote);
-
-    return Ok(None);
-  }
-
-  async updateQuote(quote: ActorQuote): Promise<Result<None, Error<String>>> {
-    // addQuote(quote: ActorQuote): Result<None, Error<String>> {
-    console.log(`adding quote`);
-    await simulateLoad();
-
-    this.props.quotes.push(quote);
-
-    return Ok(None);
-  }
-
-  async updateCurrentEdit(currentEdit: CurrentEdit) {
-    console.log(currentEdit);
-    this.props.currentEdit = currentEdit;
-  }
-
-  print() {
-    console.log(`printing`);
-  }
-
-  // async addAuthor(author: IAuthor): Promise<Result<None, Error<String>>> {
-  //   await simulateLoad();
-
-  //   this.authors.push(author);
-
-  //   return Ok(None);
-  // }
+			return Err(new ErrNotFound("Actor not found"));
+		} catch (error) {
+			return Err(new ErrBadRequest("Failed to delete actor"));
+		}
+	}
 }
 
-export class ProtocolLibrary extends Actor {
-  public constructor() {
-    super();
-  }
-
-  onChange(): void {}
-  // onQuotesChanged(quotes: ActorQuote[]): void {}
-  // onAuthorsChanged(authors: IAuthor[]): void {}
+/**
+ * Use this only when it creates a new actor via Actor System
+ */
+export abstract class IProtocolNewContent implements IProtocol {
+	/**
+	 * Called when there's a new ActorQuote.
+	 */
+	abstract onNewQuote(actor: ActorQuote): void;
+	/**
+	 * Called when there's a new ActorAuthoe.
+	 */
+	abstract onNewAuthor(actor: ActorAuthor): void;
 }

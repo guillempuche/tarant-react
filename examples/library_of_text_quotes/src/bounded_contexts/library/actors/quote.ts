@@ -1,64 +1,85 @@
-import { Actor } from 'tarant';
-import { None, Ok, Option, Result } from 'ts-results';
-import { v4 as uuid } from 'uuid';
+import { Actor, IProtocol, Topic } from "tarant";
+import { None, Option, Some } from "ts-results";
+import { v4 as uuid } from "uuid";
 
-import { Error } from '../../../actors';
+import { LibraryIds } from ".";
+import { Error } from "../../../common_actors";
 
-export interface IQuote {
-  id: string;
-  text: string;
-  authorRef: Option<string>;
-  collectionRef: Option<string>;
-  createdAt: Date;
-  updatedAt: Option<Date>;
-}
-
-export interface QuoteParamaters {
-  text: string;
-  collectionRef?: Option<string>;
-}
+export type ActorQuoteConstructor = {
+	topic: Topic<IProtocolActorQuote>;
+	id?: string;
+	text?: string;
+	authorRef?: string;
+	collectionRef?: string;
+	createdAt?: Date;
+	isDraft?: boolean;
+};
 
 export class ActorQuote extends Actor {
-  readonly props: IQuote;
+	#text: string;
+	#authorRef: Option<string>;
+	#collectionRef: Option<string>;
+	#isDraft: boolean;
+	readonly #createdAt: Date;
+	#topic: Topic<IProtocolActorQuote>;
 
-  constructor(props: IQuote) {
-    super(`quote/${props.id}`);
-    this.props = props;
-  }
+	constructor({
+		topic,
+		id = uuid(),
+		text = "",
+		authorRef,
+		collectionRef,
+		isDraft = true,
+		createdAt = new Date(),
+	}: ActorQuoteConstructor) {
+		super(`${LibraryIds.quote}/${id}`);
+		this.#text = text;
+		this.#authorRef = !authorRef ? None : Some(authorRef);
+		this.#collectionRef = !collectionRef ? None : Some(collectionRef);
+		this.#isDraft = isDraft;
+		this.#createdAt = createdAt;
+		this.#topic = topic;
+	}
+	get text(): string {
+		return this.#text;
+	}
+	get authorRef(): Option<string> {
+		return this.#authorRef;
+	}
+	get collectionRef(): Option<string> {
+		return this.#collectionRef;
+	}
+	get isDraft(): boolean {
+		return this.#isDraft;
+	}
+	get createdAt(): Date {
+		return this.#createdAt;
+	}
+	setText(value: string) {
+		this.#text = value;
+		this.#topic.notify("onUpdate", this);
+		console.info("onUpdate");
+	}
+	setAuthorRef(value: Option<string>) {
+		this.#authorRef = value;
+		this.#topic.notify("onUpdate", this);
+		console.info("onUpdate");
+	}
+	setCollectionRef(value: Option<string>) {
+		this.#collectionRef = value;
+		this.#topic.notify("onUpdate", this);
+		console.info("onUpdate");
+	}
+	setIsDraft(value: boolean) {
+		this.#isDraft = value;
+		this.#topic.notify("onUpdate", this);
+		console.info("onUpdate");
+	}
+}
 
-  static create({
-    id,
-    text,
-    authorRef,
-    collectionRef,
-    createdAt,
-    updatedAt,
-  }: IQuote): Result<ActorQuote, Error<String>> {
-    return Ok(
-      new ActorQuote({
-        id,
-        text,
-        authorRef,
-        collectionRef,
-        createdAt,
-        updatedAt,
-      })
-    );
-  }
-
-  static createSimple({
-    text,
-    collectionRef = None,
-  }: QuoteParamaters): Result<ActorQuote, Error<String>> {
-    return Ok(
-      new ActorQuote({
-        id: uuid(),
-        text,
-        authorRef: None,
-        collectionRef,
-        createdAt: new Date(),
-        updatedAt: None,
-      })
-    );
-  }
+export abstract class IProtocolActorQuote implements IProtocol {
+	/**
+	 * Called when there's an update in an ActorQuote.
+	 */
+	abstract onUpdate(actorQuote: ActorQuote): void;
 }

@@ -1,50 +1,33 @@
-import { Actor } from 'tarant';
-import { None, Ok, Option, Result } from 'ts-results';
-import { v4 as uuid } from 'uuid';
+import { Actor } from "tarant";
+import { None, Option, Some } from "ts-results";
 
-import { Error } from '../../../actors';
+import { LibraryIds } from ".";
+import { Error } from "../../../common_actors";
 
-export interface ICollection {
-  id: string;
-  name: string;
-  parentRef: Option<string>;
-}
+export type ActorCollectionConstructor = {
+	id?: string;
+	name?: string;
+	parentRef?: string;
+};
 
-export interface CollectionParamaters {
-  name: string;
-}
+export type ICollectionParams = {
+	name: string;
+};
 
+// TODO: it's a little incomplete
 export class ActorCollection extends Actor {
-  readonly props: ICollection;
+	#name: Option<string>;
+	#parentRef: Option<string>;
 
-  constructor(props: ICollection) {
-    super(`collection/${props.id}`);
-    this.props = props;
-  }
-
-  static create({
-    id,
-    name,
-    parentRef,
-  }: ICollection): Result<ActorCollection, Error<String>> {
-    return Ok(
-      new ActorCollection({
-        id,
-        name,
-        parentRef,
-      })
-    );
-  }
-
-  static createFromName({
-    name,
-  }: CollectionParamaters): Result<ActorCollection, Error<String>> {
-    return Ok(
-      new ActorCollection({
-        id: uuid(),
-        name,
-        parentRef: None,
-      })
-    );
-  }
+	constructor({ id, name, parentRef }: ActorCollectionConstructor) {
+		super(`${LibraryIds.collection}/${id}`);
+		this.#name = !name ? None : Some(name);
+		this.#parentRef = !parentRef ? None : Some(parentRef);
+	}
+	get name(): Option<string> {
+		return this.#name;
+	}
+	get parentRef(): Option<string> {
+		return this.#parentRef;
+	}
 }
