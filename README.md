@@ -15,6 +15,7 @@ To install `tarant-react-hook`, add it to your project using npm or yarn:
 npm install tarant-react-hook
 # or
 yarn add tarant-react-hook
+```
 
 Ensure that you have `tarant` and React 18 or higher installed in your project as they are peer dependencies of this library.
 
