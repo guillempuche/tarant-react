@@ -32,7 +32,12 @@ import { ReactMaterializer } from 'tarant-react-hook';
 const actorSystem = ActorSystem.for(
   ActorSystemConfigurationBuilder.define()
     .withMaterializers([new ReactMaterializer()])
-    .done(),
+    .done()
+)
+
+export const myActor = actorSystem.actorOf(MyActor, {
+	args...
+});
 ```
 
 ### Using the `useActor` Hook
@@ -42,12 +47,12 @@ Use the `useActor` hook to manage actor states in your components:
 ```tsx
 import React from 'react';
 import { useActor } from 'tarant-react-hook';
-import { MyActor } from './actors';
+import { myActor } from './actors';
 
 const MyComponent = () => {
-  const myActor = useActor(MyActor, {...args});
+  const myActorState = useActor(myActor, { debug: true});
 
-  return <div>{myActor.fieldA}</div>;
+  return <div>{myActorState.fieldA}</div>;
 };
 ```
 
