@@ -60,6 +60,10 @@ const MyComponent = () => {
 
 For a comprehensive example, check out the [Library of Text Quotes example](https://github.com/guillempuche/tarant-react/blob/main/examples/library_of_text_quotes/) which demonstrates how to use `tarant-react-hook` to build a simple application.
 
+Try it here on this [CodeSandbox](https://fg32c4-3000.csb.app/).
+
+![Example](example.png)
+
 ## Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/guillempuche/tarant-react/issues).
