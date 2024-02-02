@@ -1,6 +1,6 @@
 {
   "name": "tarant-react-hook",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "React Hook for the actor model library Tarant",
   "module": "dist/esm/bundle.js",
   "types": "dist/esm/index.d.ts",
