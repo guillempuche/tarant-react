@@ -13,8 +13,7 @@
   },
   "peerDependencies": {
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
-    "tarant": ">=3.1.47"
+    "tarant": ">=4.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -38,7 +37,7 @@
     "@types/react": "^18.2.48",
     "@types/uuid": "^9.0.1",
     "rollup": "^4.9.2",
-    "tarant": "portal:../tarant",
+    "tarant": "github:guillempuche/tarant#v4.0.0",
     "typescript": "^5.3.1"
   },
   "contributors": [

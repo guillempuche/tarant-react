@@ -16,7 +16,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-tooltip": "^5.26.0",
-    "tarant": "portal:../../../tarant",
+    "tarant": "github:guillempuche/tarant#v4.0.0",
     "tarant-local-storage": "^2.0.2",
     "tarant-react-hook": "portal:../../",
     "ts-pattern": "^5.0.6",

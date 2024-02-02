@@ -915,7 +915,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-tooltip: "npm:^5.26.0"
     tailwindcss: "npm:^3.2.7"
-    tarant: "portal:../../../tarant"
+    tarant: "github:guillempuche/tarant#v4.0.0"
     tarant-local-storage: "npm:^2.0.2"
     tarant-react-hook: "portal:../../"
     ts-pattern: "npm:^5.0.6"
@@ -2619,18 +2619,18 @@ __metadata:
     uuid: "npm:^9.0.0"
   peerDependencies:
     react: ">=18.0.0"
-    react-dom: ">=18.0.0"
-    tarant: ">=3.1.47"
+    tarant: ">=4.0.0"
   languageName: node
   linkType: soft
 
-"tarant@portal:../../../tarant::locator=actor-model-tarant-with-react%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "tarant@portal:../../../tarant::locator=actor-model-tarant-with-react%40workspace%3A."
+"tarant@github:guillempuche/tarant#v4.0.0":
+  version: 4.0.0
+  resolution: "tarant@https://github.com/guillempuche/tarant.git#commit=a2fcc69256e8e7d66de9e4f457042f1ef9f98e8c"
   dependencies:
     tslib: "npm:2.6.2"
+  checksum: 8b3b13121c5636c1e22bf136fb25a4dcf7fe23ae8436ca6cd734ebbacb4de9c9baa7e61017a26a46b4ffb6d44c3d1b2b42c57b1e6a3be446308cbfdbbaa7330d
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "thenify-all@npm:^1.0.0":
   version: 1.6.0
