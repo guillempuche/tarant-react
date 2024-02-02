@@ -1,33 +1,15 @@
 {
-  // These tasks will run in order when initializing your CodeSandbox project.
-  "setupTasks": [
-    {
-      "command": "cd examples/library_of_text_quotes  && npm install",
-      "name": "n"
-    }
-  ],
-
-  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
-  "tasks": {
-    "build": {
-      "name": "build",
-      "command": "npm run build",
-      "runAtStart": false
-    },
-    "start": {
-      "name": "start",
-      "command": "npm run start",
-      "runAtStart": true
-    },
-    "format": {
-      "name": "format",
-      "command": "npm run format",
-      "runAtStart": false
-    },
-    "cd examples/library_of_text_quotes  && npm start": {
-      "name": "cd examples/library_of_text_quotes  && npm start",
-      "command": "cd examples/library_of_text_quotes  && npm start",
-      "runAtStart": true
-    }
-  }
+	"$schema": "https://codesandbox.io/schemas/tasks.json",
+	"setupTasks": [],
+	"tasks": {
+		"install-dependencies": {
+			"name": "Install dependencies",
+			"command": "cd examples/library_of_text_quotes && yarn install"
+		},
+		"start": {
+			"name": "Run example app",
+			"command": "cd examples/library_of_text_quotes && yarn start",
+			"runAtStart": true
+		}
+	}
 }
