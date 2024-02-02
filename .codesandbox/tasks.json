@@ -1,12 +1,12 @@
 {
 	"$schema": "https://codesandbox.io/schemas/tasks.json",
-	"setupTasks": [],
+	"setupTasks": ["yarn install", "yarn build"],
 	"tasks": {
-		"install-dependencies": {
-			"name": "Install dependencies",
+		"example-install-dependencies": {
+			"name": "Install example app dependencies",
 			"command": "cd examples/library_of_text_quotes && yarn install"
 		},
-		"start": {
+		"example-start": {
 			"name": "Run example app",
 			"command": "cd examples/library_of_text_quotes && yarn start",
 			"runAtStart": true
