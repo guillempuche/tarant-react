@@ -1,12 +1,63 @@
-# Tarant in React
+# Tarant React Hook
 
-This library allows using Tarant in React.
+A React hook library designed to seamlessly integrate [Tarant](https://github.com/guillempuche/tarant), an actor model library, into React applications. This library provides hooks and utilities to manage actor lifecycle and state within React components, facilitating the development of reactive and scalable applications with the actor model pattern.
 
-Under the hood is using the React Hook `useSyncExternalStore`. Documentation [here](https://beta.reactjs.org/reference/react/useSyncExternalStore). This library uses a backwards-compatible shim for [useSyncExternalStore by Meta](https://github.com/facebook/react/tree/main/packages/use-sync-external-store)
+## Features
 
-The core implementation comes from [Kevin Mas](https://www.github.com/kmruiz/).
+- **React Materializer**: A custom materializer for integrating Tarant actors with React, managing actor lifecycle and state updates.
+- **useActor Hook**: A React hook to subscribe to Tarant actor states and re-render components upon state changes.
 
-Yarn:
+## Installation
 
-- yarn & and for your IDE https://yarnpkg.com/getting-started/editor-sdks
-<!-- - to work with the examples in IDE VScode, open each example folder on VSCode because of Yarn PnP needs to know where to look for TypeScript. -->
+To install `tarant-react-hook`, add it to your project using npm or yarn:
+
+```bash
+npm install tarant-react-hook
+# or
+yarn add tarant-react-hook
+
+Ensure that you have `tarant` and React 18 or higher installed in your project as they are peer dependencies of this library.
+
+## Usage
+
+### Setting up the React Materializer
+
+First, initialize your Tarant actor system with the `ReactMaterializer`:
+
+```typescript
+import { ActorSystem } from 'tarant';
+import { ReactMaterializer } from 'tarant-react-hook';
+
+const actorSystem = ActorSystem.for(
+  ActorSystemConfigurationBuilder.define()
+    .withMaterializers([new ReactMaterializer()])
+    .done(),
+```
+
+### Using the `useActor` Hook
+
+Use the `useActor` hook to manage actor states in your components:
+
+```tsx
+import React from 'react';
+import { useActor } from 'tarant-react-hook';
+import { MyActor } from './actors';
+
+const MyComponent = () => {
+  const myActor = useActor(MyActor, {...args});
+
+  return <div>{myActor.fieldA}</div>;
+};
+```
+
+## Example
+
+For a comprehensive example, check out the [Library of Text Quotes example](https://github.com/guillempuche/tarant-react/blob/main/examples/library_of_text_quotes/) which demonstrates how to use `tarant-react-hook` to build a simple application.
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/guillempuche/tarant-react/issues).
+
+## License
+
+`tarant-react-hook` is [MIT licensed](https://github.com/guillempuche/tarant-react/blob/main/LICENSE).
