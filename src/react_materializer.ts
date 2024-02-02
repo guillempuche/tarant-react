@@ -1,84 +1,5 @@
-import { parse, stringify } from "flatted";
-import { fromJS } from "immutable";
 import { Actor, ActorMessage, IMaterializer } from "tarant";
-
-// function isGetter(actor: Actor, property: PropertyKey): boolean {
-//   const descriptor = Object.getOwnPropertyDescriptor(
-//     Object.getPrototypeOf(actor),
-//     property
-//   );
-//   return !!descriptor && typeof descriptor.get === 'function';
-// }
-// function shallowCopyOfActorState(actor: Actor): ActorState {
-//   // const state: Partial<ActorState> = {};
-//   const state: ActorState = {};
-
-//   Reflect.ownKeys(actor)
-//     .filter((key) => typeof key === 'string' || typeof key === 'number') // Filter out symbols
-//     .forEach((key) => {
-//       if (isGetter(actor, key)) {
-//         (state as any)[key] = actor[key as keyof Actor];
-//       }
-//     });
-
-//   return state;
-// }
-
-// function shallowCopyOfActorState(actor: Actor): ActorState {
-//   // const copy = { ...actor };
-//   const copy = new Proxy(actor, {});
-
-//   delete copy.self;
-//   // delete copy.materializers;
-//   // delete copy.scheduled;
-//   // delete copy.topicSubscriptions;
-//   // delete copy.busy;
-//   // delete copy.partitions;
-//   // delete copy.system;
-//   // delete copy.supervisor;
-//   delete copy.reactState;
-//   delete copy.reactSnapshot;
-//   delete copy.stateChangeSubscriptions;
-
-//   // Make the actor state immutable.
-//   // return Object.freeze<ActorState>(copy);
-//   return copy;
-// }
-
-// interface DevToolsWindow extends Window {
-// 	__REACT_DEVTOOLS_GLOBAL_HOOK__?: {
-// 		emit: (event: string, data: any) => void;
-// 		// Add other methods or properties of __REACT_DEVTOOLS_GLOBAL_HOOK__ as needed
-// 	};
-// }
-
-// @ts-ignore
-const devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-
-// function serializeActorState(actor: Actor): any {
-// 	const state: { [key: string]: any } = {};
-
-// 	// Reflect.ownKeys can be used to get all properties including non-enumerable ones
-// 	// biome-ignore lint/complexity/noForEach: <explanation>
-// 	Reflect.ownKeys(actor).forEach((key) => {
-// 		if (typeof key === 'string') {
-// 			// Assuming you want to serialize only string-keyed properties
-// 			const descriptor = Object.getOwnPropertyDescriptor(
-// 				Object.getPrototypeOf(actor),
-// 				key
-// 			);
-// 			if (descriptor && typeof descriptor.get === 'function') {
-// 				state[key] = actor[key as keyof Actor];
-// 				console.log(
-// 					`serializeActorState property ${key}:`,
-// 					actor[key as keyof Actor]
-// 				); // Logging
-// 			}
-// 		}
-// 	});
-
-// 	return state;
-// }
+import { Some } from "ts-results";
 
 /**
  * A materializer for React that integrates with the Tarant actor model.
@@ -91,10 +12,8 @@ export class ReactMaterializer implements IMaterializer {
 	 * @param actor The actor being initialized.
 	 */
 	onInitialize(actor: Actor) {
-		actor.stateChangeSubscriptions = new Map<
-			string,
-			React.DispatchWithoutAction
-		>();
+		actor.stateCopy = deepCloning(actor);
+		actor.stateChangeSubscriptions = new Map();
 	}
 
 	/**
@@ -111,21 +30,8 @@ export class ReactMaterializer implements IMaterializer {
 	 * @param message The message that was processed.
 	 */
 	onAfterMessage(actor: Actor, message: ActorMessage) {
-		if (actor.stateChangeSubscriptions) {
-			console.log(`onAfterMessage: ${actor.id}`);
-
-			const deepCopy = parse(stringify(actor));
-			// console.log('useActorState deepCopy =', deepCopy);
-			// console.log('useActorState deepCopy =', stringify(actor));
-			// console.log('useActorState deepCopy =', fromJS(actor));
-			actor.stateCopy = stringify(actor);
-
-			for (const callback of actor.stateChangeSubscriptions.values()) {
-				if (callback) {
-					callback();
-				}
-			}
-		}
+		actor.stateCopy = deepCloning(actor);
+		actor.stateChangeSubscriptions?.forEach((callback) => callback());
 	}
 
 	/**
@@ -137,4 +43,75 @@ export class ReactMaterializer implements IMaterializer {
 	onError(actor: Actor, message: ActorMessage, error: any) {
 		console.error(error);
 	}
+}
+
+function deepCloning<T extends Actor>(actor: T): any {
+	const skipFields = new Set([
+		"stateCopy",
+		"stateChangeSubscriptions",
+		"self",
+		"ref",
+		"partitions",
+		"subscriptions",
+		"system",
+		"materializers",
+		"supervisor",
+		"scheduled",
+		"topicSubscriptions",
+		"busy",
+	]);
+
+	function cloneValue(value: any): any {
+		if (value instanceof Actor) {
+			return deepCloneObject(value);
+		}
+		if (value instanceof Some) {
+			return cloneValue(value.val);
+		}
+		if (value instanceof Date) {
+			return new Date(value);
+		}
+		if (value instanceof Map) {
+			return new Map(Array.from(value, ([key, val]) => [key, cloneValue(val)]));
+		}
+		if (value instanceof Set) {
+			return new Set(Array.from(value, cloneValue));
+		}
+		if (Array.isArray(value)) {
+			return value.map(cloneValue);
+		}
+
+		if (value !== null && typeof value === "object") {
+			return deepCloneObject(value);
+		}
+		return value;
+	}
+	// Function to clone object considering getters
+	function deepCloneObject(actor: Actor | any): any {
+		if (actor.id === undefined) return undefined;
+		const cloneObj: any = { id: actor.id };
+		const prototype = Object.getPrototypeOf(actor);
+
+		// Object.getOwnPropertyNames(prototype).forEach((prop) => {
+		// 	if (skipFields.has(prop)) return;
+		// 	if (prop === "constructor") return;
+		// 	const descriptor = Object.getOwnPropertyDescriptor(prototype, prop);
+		// 	if (descriptor && typeof descriptor.get === "function") {
+		// 		cloneObj[prop] = cloneValue(actor[prop]);
+		// 	}
+		// });
+		const propertyNames = Object.getOwnPropertyNames(prototype);
+		for (const prop of propertyNames) {
+			if (skipFields.has(prop)) continue;
+			if (prop === "constructor") continue;
+			const descriptor = Object.getOwnPropertyDescriptor(prototype, prop);
+			if (descriptor && typeof descriptor.get === "function") {
+				cloneObj[prop] = cloneValue(actor[prop]);
+			}
+		}
+
+		return cloneObj;
+	}
+	const clone = deepCloneObject(actor);
+	return clone;
 }

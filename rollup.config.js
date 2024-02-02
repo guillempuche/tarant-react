@@ -1,13 +1,13 @@
 // const babel = require('@rollup/plugin-babel');
 // const commonjs = require('@rollup/plugin-commonjs');
 // const nodeResolve = require('@rollup/plugin-node-resolve');
-const typescript = require('@rollup/plugin-typescript');
+const typescript = require("@rollup/plugin-typescript");
 
-const pkg = require('./package.json');
+const pkg = require("./package.json");
 
 module.exports = (args) => [
 	{
-		input: 'src/index.ts',
+		input: "src/index.ts",
 		output: [
 			// {
 			// 	file: pkg.main,
@@ -16,11 +16,11 @@ module.exports = (args) => [
 			// },
 			{
 				file: pkg.module,
-				format: 'esm',
+				format: "esm",
 				sourcemap: true,
 			},
 		],
-		external: ['tarant', 'react', 'ts-results'],
+		external: ["react", "tarant", "ts-results", "uuid"],
 		plugins: [
 			// // Resolves node modules for external dependencies
 			// nodeResolve(),

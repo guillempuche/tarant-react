@@ -14,6 +14,3 @@ babel.config.js
 
 # Example app
 examples/
-
-# Rest
-draft/

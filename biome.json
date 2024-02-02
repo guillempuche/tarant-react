@@ -5,15 +5,15 @@
 	},
 	"linter": {
 		"enabled": true,
-		"ignore": [
-			"dist",
-			"draft",
-		],
+		"ignore": ["dist"],
 		"rules": {
 			"recommended": true,
 			"suspicious": {
 				"noExplicitAny": "warn",
 				"noShadowRestrictedNames": "warn"
+			},
+			"correctness": {
+				"useExhaustiveDependencies": "warn"
 			},
 			"complexity": {
 				"noForEach": "warn"
@@ -27,9 +27,6 @@
 		"indentWidth": 2,
 		"lineWidth": 80,
 		"lineEnding": "lf",
-		"ignore": [
-			"dist",
-			"draft",
-		]
+		"ignore": ["dist"]
 	}
 }
