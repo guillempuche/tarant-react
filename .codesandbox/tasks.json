@@ -1,15 +1,29 @@
 {
-	"$schema": "https://codesandbox.io/schemas/tasks.json",
-	"setupTasks": ["yarn install", "yarn build"],
-	"tasks": {
-		"example-install-dependencies": {
-			"name": "Install example app dependencies",
-			"command": "cd examples/library_of_text_quotes && yarn install"
-		},
-		"example-start": {
-			"name": "Run example app",
-			"command": "cd examples/library_of_text_quotes && yarn start",
-			"runAtStart": true
-		}
-	}
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    {
+      "name": "yarn install",
+      "command": "yarn install"
+    },
+    {
+      "name": "yarn build",
+      "command": "yarn build"
+    }
+  ],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "example-install-dependencies": {
+      "name": "Install example app dependencies",
+      "command": "cd examples/library_of_text_quotes && yarn install"
+    },
+    "example-start": {
+      "name": "Run example app",
+      "command": "cd examples/library_of_text_quotes && yarn start",
+      "runAtStart": true,
+      "preview": {
+        "port": 3000
+      }
+    }
+  }
 }
